@@ -17,7 +17,13 @@ let content = fs.readFileSync(readmePath, 'utf8');
 
 // Replace previous username patterns (e.g. mostuf25561) with targetUser
 const oldUserRegex = /mostuf\d+/g;
-const updatedContent = content.replace(oldUserRegex, targetUser);
+let updatedContent = content.replace(oldUserRegex, targetUser);
+
+// Ensure all repository links (badges, raw scripts, releases, and GitHub Pages) point to targetUser
+updatedContent = updatedContent
+  .replace(/(https:\/\/github\.com\/)[^/]+(\/youtubenet3)/g, `$1${targetUser}$2`)
+  .replace(/(https:\/\/raw\.githubusercontent\.com\/)[^/]+(\/youtubenet3)/g, `$1${targetUser}$2`)
+  .replace(/https:\/\/[^/.]+\.github\.io\/youtubenet3/g, `https://${targetUser}.github.io/youtubenet3`);
 
 fs.writeFileSync(readmePath, updatedContent, 'utf8');
 console.log(`✅ README.md successfully updated with repository username: "${targetUser}"`);

@@ -1,0 +1,67 @@
+name: Update README Links & Badges
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'scripts/update-readme.mjs'
+      - '.github/workflows/readme.yml'
+  workflow_dispatch:
+    inputs:
+      username:
+        description: 'Target GitHub username or repository owner for README badges & links (leave empty to use repository owner)'
+        required: false
+        default: ''
+
+concurrency:
+  group: update-readme-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  update-readme:
+    name: Update README.md
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run update-readme Script
+        run: |
+          TARGET_USER="${{ inputs.username }}"
+          if [ -z "$TARGET_USER" ]; then
+            TARGET_USER="${{ github.repository_owner }}"
+          fi
+          echo "Executing update-readme with target user: $TARGET_USER"
+          node scripts/update-readme.mjs "$TARGET_USER"
+
+      - name: Commit and Push Changes If Updated
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain README.md)" ]; then
+            echo "Changes detected in README.md. Committing and pushing..."
+            git add README.md
+            TARGET_USER="${{ inputs.username }}"
+            if [ -z "$TARGET_USER" ]; then
+              TARGET_USER="${{ github.repository_owner }}"
+            fi
+            git commit -m "docs: update README.md repository owner and links to $TARGET_USER [skip ci]"
+            git push
+            echo "Successfully updated README.md"
+          else
+            echo "README.md is already up to date. No changes needed."
+          fi

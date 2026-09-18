@@ -8,6 +8,18 @@ All notable changes and completed historical tasks for the YouTube Video Viewer 
 
 ## Historical Completed Tasks Archive
 
+### Automated README Links & Badges Synchronization Workflow (`readme.yml`)
+
+- **Dedicated GitHub Actions Workflow (`.github/workflows/readme.yml`)**:
+  - Implemented automated workflow executing on `workflow_dispatch` (with customizable `username` input defaulting to `${{ github.repository_owner }}`) and on `push` to `main`/`master` when `scripts/update-readme.mjs` or `readme.yml` changes.
+  - Configured with `contents: write` permissions, Node.js 20 environment, and conditional git commit/push via `github-actions[bot]` with `[skip ci]` flag when differences are detected in `README.md`.
+- **Resilient URL Pattern Matching in Update Script (`scripts/update-readme.mjs`)**:
+  - Enhanced `update-readme.mjs` to comprehensively match and update all repository badges, raw script download URLs, release asset URLs, and GitHub Pages demo/runner links across repeated runs and forks.
+- **Documentation & Status Tracking (`README.md`)**:
+  - Added the `Update README` workflow status badge to `README.md` alongside existing release, web, emulation, and deploy badges.
+  - Synchronized all URLs with repository owner `mostuf2556`.
+- **Status**: Completed & 100% Verified.
+
 ### Dedicated TTS Input Texts List View (Newer on Top Default View)
 
 - **TTS Input Tracking Feed in Core Engine (`ttsEngine.ts`)**:
